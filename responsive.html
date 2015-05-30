@@ -1,0 +1,52 @@
+<html>
+   <head>
+   <title>TEST ADS OpenX Google</title>
+   <script type='text/javascript'>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+  (function() {
+    var gads = document.createElement('script');
+    gads.async = true;
+    gads.type = 'text/javascript';
+    var useSSL = 'https:' == document.location.protocol;
+    gads.src = (useSSL ? 'https:' : 'http:') +
+      '//www.googletagservices.com/tag/js/gpt.js';
+    var node = document.getElementsByTagName('script')[0];
+    node.parentNode.insertBefore(gads, node);
+  })();
+</script>
+
+<script type='text/javascript'>
+  googletag.cmd.push(function() {
+	var sizeMapping = googletag.sizeMapping().
+		addSize([234, 60],[234, 60]).
+		addSize([300, 100],[300, 100]).
+		addSize([320, 50],[320, 50]).
+		addSize([468, 60],[468, 60]).
+		addSize([728, 90],[728, 90]).
+		addSize([970, 90],[728, 90]).
+		addSize([1100, 90],[728, 90]).
+		addSize([1200, 90],[728, 90]).
+		addSize([1400, 90],[728, 90]).
+      build();
+
+    // Definition of the GPT AdSlot tag
+    var adSlot = googletag.defineUnit(
+      '/271445403/music_mobile_ATF_TOP', [728, 90], 'ad-slot').
+      defineSizeMapping(sizeMapping). // setting the predefined Size Mapping
+      setCollapseEmptyDiv(true).
+      addService(googletag.pubads());
+      googletag.enableServices();
+
+  });
+</script>
+   </head>
+   <body>
+   <!-- /271445403/dara_mobile_ATF_TOP -->
+<div id='ad-slot'>
+<script type='text/javascript'>
+googletag.cmd.push(function() { googletag.display('ad-slot'); });
+</script>
+</div>
+   </body>
+</html>
