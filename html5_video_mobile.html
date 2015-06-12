@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>No GPT</title>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+   </head>
+   <body>
+      <div id="mainContainer">
+         <div id="timer" style="display:none; position: absolute; z-index: 99999; top:20px; color: white; font-size:20px; left: 15px;"></div>
+         <div id="content">
+            <video controls width="300" height="250" id="contentElement" >
+               <source src="http://html5.imprezzer.com/monglok17may.mp4"></source>
+            </video>
+         </div>
+         <div id="adContainer" style="position: absolute; top: 8px;"></div>
+      </div>
+      <script type="text/javascript" src="http://s0.2mdn.net/instream/html5/ima3_debug.js"></script>
+      <script type="text/javascript">
+         var contentInitialized = false;
+         var adsLoaded = false;
+         var adContainerElement = document.getElementById('adContainer');
+         
+         
+         var adsManager; 
+         var adsLoader;
+         videoElement = document.getElementById("contentElement");
+         google.ima.settings.setLocale('en');
+         
+         function initializeContent() {
+           var videoElement = document.getElementById('contentElement');
+           videoElement.src = 'https://youtu.be/bS5P_LAqiVg';
+           videoElement.addEventListener(
+               'loadedmetadata',
+               function() {
+                 contentInitialized = true;
+                 if (adsLoaded) {
+                   startAds();
+                 }
+               });
+           videoElement.load();
+         }
+         
+         function onAdsLoaded() {
+           adsLoaded = true;
+           if (contentInitialized) {
+             startAds();
+           }
+         }
+         
+         // Initial user action.
+         function loadAds() {
+           var adDisplayContainer = new google.ima.AdDisplayContainer(adContainerElement);
+           adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+         
+           // Will call adsLoaded() once the ads are ready.
+           console.log("load ads");
+         // Register ended listener.
+         videoElement.addEventListener('ended', onContentEnded, false);
+         
+         var adsRequest = new google.ima.AdsRequest();
+         
+         //Manager DFP
+         adsRequest.adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/6337308/VDO_Test&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
+         
+         adsRequest.linearAdSlotWidth = videoElement.width;
+         console.log("player width: " + videoElement.width);
+         adsRequest.linearAdSlotHeight = videoElement.height;
+         console.log("player width: " + videoElement.height);
+         adsRequest.nonLinearAdSlotWidth = videoElement.width;
+         adsRequest.nonLinearAdSlotHeight = videoElement.height;
+         
+         var rend = new google.ima.AdsRenderingSettings();
+         
+         adsLoader.addEventListener(
+         	google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+         	onAdsManagerLoaded);
+         adsLoader
+         	.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
+         adsLoader.requestAds(adsRequest);
+           // Always initialize the container first.
+           adDisplayContainer.initialize();
+         
+           // Initialize the content. This will start the playback once the ads
+           // are loaded.
+           initializeContent();
+         }
+         
+         function onAdsManagerLoaded(adsManagerLoadedEvent) {
+         console.log("Ads are loaded!");
+         adsManager = adsManagerLoadedEvent.getAdsManager(contentElement);
+         addEventHandlers();
+         //startAds();
+         }
+         
+         
+         function onAdError(adErrorEvent) {
+         console.log("Ad error: " + adErrorEvent.getError());
+         }
+         
+         function addEventHandlers() {
+         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR,
+         	onAdError);
+         adsManager.addEventListener(
+         	google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, function() {
+         		videoElement.pause();
+         	});
+         adsManager.addEventListener(
+         	google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, function() {
+         		videoElement.play();
+         		console.log("play was called ");
+         	});
+         var adEvents = [ google.ima.AdEvent.Type.LOADED,
+         	google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
+         	google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
+         	google.ima.AdEvent.Type.CLICK, google.ima.AdEvent.Type.COMPLETE,
+         	google.ima.AdEvent.Type.FIRST_QUARTILE,
+         	google.ima.AdEvent.Type.MIDPOINT, google.ima.AdEvent.Type.PAUSED,
+         	google.ima.AdEvent.Type.STARTED,
+         	google.ima.AdEvent.Type.THIRD_QUARTILE,
+         	google.ima.AdEvent.Type.USER_CLOSE,
+         	google.ima.AdEvent.Type.ALL_ADS_COMPLETED ];
+           for (event in adEvents) {
+           	  adsManager.addEventListener(adEvents[event], onAdEvent);
+           }
+         }
+         
+         function startAds() {
+           try {
+             adsManager.init(videoElement.width, videoElement.height,
+                    google.ima.ViewMode.FULLSCREEN);
+             adsManager.start();
+           } catch (e) {
+           	  console.log('Error starting ads: ' + e);
+           }
+         }
+         
+         function onAdEvent(event) {
+         console.log('Ad event: ' + event.type);
+         /*if (event.type == "start") {
+         resumeAd();
+         }*/
+         switch (event.type) {
+              case google.ima.AdEvent.Type.STARTED:
+         	resumeAd();	
+         	onAdsStarted(event);
+                // Get the ad from the event.
+                var ad = event.getAd();
+         	console.log(ad + " Hello");
+         	for(var prop in ad){
+         		console.log(prop);
+         	}
+         	console.log("My url is " + ad.getTraffickingParameters().url);
+         	console.log(ad.getTraffickingParametersString());
+         	
+         	console.log("My companions " + ad.getCompanionAds());
+         	
+         	var pod = ad.getAdPodInfo();
+         
+         	console.log(pod);
+         		
+         	console.log(pod.getTotalAds());
+         	console.log(pod.getMaxDuration());
+         	
+                // Get a list of companion ads for an ad slot size and CompanionAdSelectionSettings
+                var companionAds = ad.getCompanionAds(300,
+                                                      250,
+                                                      {resourceType: google.ima.CompanionAdSelectionSettings.ResourceType.STATIC,
+                                                       creativeType: google.ima.CompanionAdSelectionSettings.CreativeType.IMAGE});
+                var companionAd = companionAds[0];
+                // Get HTML content from the companion ad.
+                var content = companionAd.getContent();
+                // Write the content to the companion ad slot.
+                var div = document.getElementById('banner1');
+                div.innerHTML = content;
+                break;
+            }
+         }
+         
+         // Register ended listener.
+         videoElement.addEventListener('ended', onContentEnded, false);
+         
+         function onContentEnded() {
+       		adsLoader.contentComplete();
+         	console.log("content event: complete");
+         	randomNumber = Math.floor(Math.random()*10000000);
+         }
+         
+         function mute() {
+         	adsManager.setVolume(0);
+         	console.log("muted!");
+         }
+         
+         function unmute() {
+         	adsManager.setVolume(1);
+         	console.log("unmuted!");
+         }
+         
+         function resumeAd() {
+         	adsManager.resume();
+         	console.log("resume ad");
+         }
+         
+         function pauseAd() {
+         	adsManager.pause();
+         	console.log("pause ad");
+         }
+         
+         function dest(){
+         	adsManager.destroy();
+         }
+         
+         // Global countdown timer
+         var countdownTimer;
+         
+         function onAdsStarted(adEvent) {
+         
+         countdownTimer = setInterval(function() {
+         var timeRemaining = adsManager.getRemainingTime();
+           $("#timer").show();
+              $("#timer").html("Counter: " + Math.round(timeRemaining));
+         }, 1000);
+         }
+         function onContentResumeRequested(adEvent) {
+         if (countdownTimer) {
+           clearInterval(countdownTimer);
+           $("#timer").hide();
+         }
+         }
+         loadAds();
+         
+         $("#adContainer").on("click", function(){
+         	startAds();
+         });
+         
+      </script>
+   </body>
+</html>
