@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript">
+ var googletag = googletag || {};
+ googletag.cmd = googletag.cmd || [];
+ (function() {
+   var gads = document.createElement("script");
+   gads.async = true;
+   gads.type = "text/javascript";
+   var useSSL = "https:" == document.location.protocol;
+   gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
+   var node =document.getElementsByTagName("script")[0];
+   node.parentNode.insertBefore(gads, node);
+  })();
+</script>
+</head>
+<body>
+<div id="gpt_listing_row3">
+  <script type='text/javascript'>
+    googletag.cmd.push(function() {    
+    var sample = '' + Math.floor(Math.random() * 10); 
+    sample = '1'; //for testing
+    googletag.defineSlot('/185460552/sg_bigweb_dealpage_goods_listing_bottom', [728, 90], 'gpt_listing_row3')
+        .addService(googletag.pubads())
+        .setTargeting('sample', [sample]);
+      googletag.enableServices();
+      googletag.display('gpt_listing_row3');
+  });
+  </script>
+</div>
+</body>
+</html>
